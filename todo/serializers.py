@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
-from todo.models import Desks, LANGUAGE_CHOICES, STYLE_CHOICES, CompanyName, Profile
+from todo.models import Desks, CompanyName, Profile
 from rest_framework.validators import UniqueTogetherValidator
 
 
@@ -26,45 +26,18 @@ class DesksSerializer(serializers.ModelSerializer):
         
         #Update and return an existing `Desks` instance, given the validated data.
         
-        instance.due_date = validated_data.get('title', instance.title)
-        instance.task = validated_data.get('code', instance.code)
-        #instance.linenos = validated_data.get('linenos', instance.linenos)
-        instance.language = validated_data.get('language', instance.language)
-        instance.style = validated_data.get('style', instance.style)
+        instance.due_date = validated_data.get('due_date', instance.title)
+        instance.task = validated_data.get('task', instance.code)
+                
+        instance.company_name = validated_data.get('company_name', instance.title)
+        instance.executor = validated_data.get('executor', instance.code)
+
+        instance.done = validated_data.get('done', instance.code)
+        
+          
         instance.save()
         return instance
 
-"""class CompanyNameSerializer(serializers.ModelSerializer):
-
-    owner = serializers.ReadOnlyField(source='owner.username')
-    company_name=serializers.SlugRelatedField(
-        #many=True,
-        #read_only=True,
-        slug_field='name',
-        queryset=CompanyName.objects.all()
-     )
-    class Meta:
-        model = CompanyName
-        fields = ('id','company_name','created','done','due_date','task','owner')
-
-
-    def create(self, validated_data):
-        
-        #Create and return a new `Desks` instance, given the validated data.
-        
-        return CompanyName.objects.create(**validated_data)
-
-    def update(self, instance, validated_data):
-        
-        #Update and return an existing `Desks` instance, given the validated data.
-        
-        instance.due_date = validated_data.get('title', instance.title)
-        instance.task = validated_data.get('code', instance.code)
-        #instance.linenos = validated_data.get('linenos', instance.linenos)
-        instance.language = validated_data.get('language', instance.language)
-        instance.style = validated_data.get('style', instance.style)
-        instance.save()
-        return instance"""
 
 from django.contrib.auth.models import User
 

@@ -26,7 +26,7 @@ import os
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'rkofd)v#0!feg+wr^v&7fs)+12kx(c2s8&iend-bgw4uixa7&=')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['murmuring-atoll-18032.herokuapp.com','127.0.0.1']
 
