@@ -36,7 +36,7 @@ class UserDetail(generics.RetrieveAPIView):
     serializer_class = UserSerializer
 """________________"""
 
-
+"""Function for administrator get all TODO-list and add new task"""
 @api_view(['GET', 'POST'])
 @permission_classes((IsAdminUser,))
 def desk_list(request):
@@ -59,6 +59,7 @@ def desk_list(request):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
+"""Function for administrator get  TODO-list of company"""
 @api_view(['GET'])
 def company_todo(request, pk):
 
@@ -79,6 +80,7 @@ def company_todo(request, pk):
             return Response('You must log in to this company',
                                 status=status.HTTP_400_BAD_REQUEST)
         
+"""Function for user AUTH"""
 @api_view(['PUT'])
 @permission_classes((IsAuthenticated,))
 def auth_user(request, pk):
@@ -108,7 +110,7 @@ def auth_user(request, pk):
              return Response('Your profile does not have access to this company',
                                 status=status.HTTP_400_BAD_REQUEST)
         
-   
+"""Function task one (for adminisrator)"""
 @api_view(['GET', 'PUT'])
 @permission_classes((IsAdminUser,))
 def desk_detail(request):
@@ -133,7 +135,7 @@ def desk_detail(request):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
- 
+"""Function for Registration"""
 @api_view(['POST'])
 def create_auth(request):
     if request.method == 'POST':
@@ -169,3 +171,70 @@ def create_auth(request):
                 
         else:
             return Response(serialized._errors, status=status.HTTP_400_BAD_REQUEST)
+
+"""Function for user get TODO-list of company and due_date"""
+@api_view(['GET'])
+def todo_detail(request, pk):
+    
+    #Retrieve, update or delete a code snippet.
+    key_idsession_f=request.GET.get("idsession")
+
+    try:
+        company = CompanyName.objects.get(name=pk)
+    except CompanyName.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        due_date_f=request.GET.get("due_date")
+        desks = Desks.objects.get(due_date=due_date_f)
+    except Desks.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if myfunctions.check_auth(key_idsession_f, company.name):
+        if request.method == 'GET':
+             
+            desks = Desks.objects.filter(company_name=company.id, due_date=due_date_f)
+            serializer = DesksSerializer(desks, many=True)
+            return Response(serializer.data)
+            
+    else:
+        return Response('You must log in to this company',
+                                    status=status.HTTP_400_BAD_REQUEST)
+
+
+"""Function for user fix DONE"""
+@api_view(['PUT'])
+def todo_done(request, pk):
+    
+    #Retrieve, update or delete a code snippet.
+    key_idsession_f=request.GET.get("idsession")
+
+    try:
+        company = CompanyName.objects.get(name=pk)
+    except CompanyName.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        due_date_f=request.GET.get("due_date")
+        task_f=request.GET.get("task")
+        desks = Desks.objects.get(due_date=due_date_f, task=task_f)
+    except Desks.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+
+    if myfunctions.check_auth(key_idsession_f, company.name):
+        if request.method == 'PUT':
+            modProfile=Profile.objects.get(idsession=key_idsession_f)
+            user_obj = User.objects.get(username=modProfile.user)
+
+            desks.done=True
+            desks.executor=user_obj.username
+            desks.save()
+            
+            serializer = DesksSerializer(desks)
+            return Response(serializer.data)
+            
+    else:
+        return Response('You must log in to this company',
+                                    status=status.HTTP_400_BAD_REQUEST)

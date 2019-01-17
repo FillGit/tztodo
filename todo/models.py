@@ -33,9 +33,16 @@ class Desks(models.Model):
     due_date = models.DateField()
     task = models.TextField()
     
-    executor = models.CharField(max_length=50, blank=True, default='', help_text="User executor")
+    executor = models.CharField(max_length=50, null=True, blank=True, help_text="User executor")
     owner = models.ForeignKey('auth.User', related_name='desks', on_delete=models.CASCADE)
     
     class Meta:
         ordering = ('created',)
+
+    def save(self, *args, **kwargs):
+        """
+        Use the `pygments` library to create a highlighted HTML
+        representation of the code snippet.
+        """
+        super(Desks, self).save(*args, **kwargs)
 
