@@ -186,7 +186,7 @@ def todo_detail(request, pk):
 
     try:
         due_date_f=request.GET.get("due_date")
-        desks = Desks.objects.get(due_date=due_date_f)
+        desks = Desks.objects.filter(due_date=due_date_f)
     except Desks.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
